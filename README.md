@@ -21,9 +21,9 @@ python FFscreenrecorder.py
 
 (Windows installer to come embedding FFMPEG)
 
-Record : Start a recording (default mp4). Timer starts.
-Stop :   Stop the current recording.
-Open :   Open recording folder. 
+- Record : Start a recording (default mp4). The window minimize itself automatically. Timer starts.
+- Stop :   Stop the current recording.
+- Open :   Open recording folder. 
 
 ## License
 
