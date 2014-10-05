@@ -15,6 +15,16 @@ A lean screencasting tool for Windows using FFMPEG (Linux soon).
 <a href="https://www.flickr.com/photos/frenchy/15264491660" title="FFscreenrecorder by francois, on Flickr"><img src="https://farm4.staticflickr.com/3934/15264491660_fc5296201d_o.jpg" width="422" height="194" alt="FFscreenrecorder"></a>
 </p>
 
+## Usage
+
+python FFscreenrecorder.py
+
+(Windows installer to come embedding FFMPEG)
+
+Record : Start a recording (default mp4). Timer starts.
+Stop :   Stop the current recording.
+Open :   Open recording folder. 
+
 ## License
 
 This program is free software; you can redistribute it and/or modify
