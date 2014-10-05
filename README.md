@@ -2,10 +2,12 @@
 
 A lean screencasting tool for Windows using FFMPEG (Linux soon).
 
-### Dependence on Windows
+(Language/libs : Python2.7 and WxPython).
+
+### External dependences on Windows
 
 - FFMPEG (Open Source), static Zeranoe build  http://ffmpeg.zeranoe.com/builds/
-- "Screen Capture DirectShow source filter" (freeware : http://www.umediaserver.net/components) (looking to replace it with an OpenSoruce filter but not requiring Java for the end user)
+- "Screen Capture DirectShow source filter" (freeware : http://www.umediaserver.net/components)
    
 ### Screenshot
 
