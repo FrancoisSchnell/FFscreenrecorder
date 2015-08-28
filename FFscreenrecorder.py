@@ -6,7 +6,7 @@
 #
 #   Dependence Windows :
 #     - FFMPEG (Open Source), static Zeranoe build  http://ffmpeg.zeranoe.com/builds/
-#     - "Screen Capture DirectShow source filter" (freeware : http://www.umediaserver.net/components)
+#     - "Screen Capture DirectShow source filter" (Freeware : http://www.umediaserver.net/components)
 #     (looking to replace it with an OpenSoruce filter but not requiring Java for the end user)
 #   
 #    Author : https://sites.google.com/site/francoisschnell/
