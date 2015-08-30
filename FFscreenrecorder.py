@@ -10,6 +10,7 @@
 #     (looking to replace it with an OpenSoruce filter but not requiring Java for the end user)
 #   
 #    Author : https://sites.google.com/site/francoisschnell/
+
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
