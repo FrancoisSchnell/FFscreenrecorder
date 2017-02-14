@@ -2,7 +2,7 @@
 
 A lean screencasting tool for Windows using FFMPEG (Linux soon).
 
-(Language/libs : Python2.7 and WxPython).
+(Language/libs : Python2.7 & WxPython).
 
 ### External dependences on Windows
 
