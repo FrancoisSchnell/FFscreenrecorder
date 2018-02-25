@@ -2,16 +2,13 @@
 # -*- coding: latin-1 -*-
 #####
 #
-# A lean screencasting tool for Windows (Linux to come) using FFMPEG.
+#   A simple screencasting tool using FFMPEG (tested on Windows and Python 3)
+#   Author : https://sites.google.com/site/francoisschnell/
 #
-#   Dependence Windows :
-#     - FFMPEG (Open Source), static Zeranoe build  http://ffmpeg.zeranoe.com/builds/
+#   Requirements Windows :
+#     - FFMPEG (Open Source), static Zeranoe build  http://ffmpeg.zeranoe.com/builds/  (copy ffmpeg.exe in script folder)
 #     - "Screen Capture DirectShow source filter" (Freeware : http://www.umediaserver.net/components)
-#     (looking to replace it with an OpenSoruce filter but not requiring Java for the end user)
-#   
-#    Author : https://sites.google.com/site/francoisschnell/
-
-#
+#    #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation; either version 2 of the License, or
@@ -30,7 +27,8 @@
 
 __version__="1.0-alpha1"
 
-import wx,os,subprocess,datetime,webbrowser
+import os,subprocess,datetime,webbrowser
+import wx,wx.adv
 
 # Global variables
 global pathData,audioinputName,videoFileOutput,recording
@@ -47,7 +45,7 @@ recording=False
 "recording status True or False"
 
 def getAudioVideoInputFfmpeg(pathData=pathData):
-        """A function to get Audio input from ffmpeg.exe (http://ffmpeg.zeranoe.com/builds/)
+        """Get Audio input from ffmpeg.exe (http://ffmpeg.zeranoe.com/builds/)
         Returns a list of two lists : [audioDevices,videoDevices]"""    
         os.system('ffmpeg -list_devices true -f dshow -i dummy > "%s"\devices.txt 2>&1' %pathData)
         audioDevices=[] 
@@ -58,41 +56,42 @@ def getAudioVideoInputFfmpeg(pathData=pathData):
         devicesList=fileDevices.readlines()
         fileDevices.close()
         def fixCaracters(name):
-            name=name.replace("é","�")
-            name=name.replace("®","�")
-            name=name.replace("è","�")
-            name=name.replace("ê","�")
+            name=name.replace("é","�")
+            name=name.replace("®","�")
+            name=name.replace("è","�")
+            name=name.replace("ê","�")
             return name
         # searching audio devices
         for index,device in enumerate(devicesList):
             if device.find("audio devices")>0:
                 audioIndex= int(index) 
-                print "Found 'audio devices' from Direcshow/ffmpeg, taking first device by default (0)"
+                print("Found 'audio devices' from Direcshow/ffmpeg, taking first device by default (0)")
             if (audioIndex!=None)and(index>audioIndex) and (device.find("exit")<0):
                 aDevice=device.split('"')[1]
-                print index-(audioIndex+1),":", aDevice
+                print(index-(audioIndex+1),":", aDevice)
                 audioDevices.append(fixCaracters(aDevice))
         # searching video devices
         for index,device in enumerate(devicesList):
             if device.find("video devices")>0:
                 videoIndex= int(index) 
-                print "Found 'video devices' from Direcshow/ffmpeg, taking first device by default (0)"
+                print("Found 'video devices' from Direcshow/ffmpeg, taking first device by default (0)")
             if device.find("audio devices")>0:
                 break
             if (videoIndex!=None) and (index>videoIndex):
                 aDevice=device.split('"')[1]
-                print index-(videoIndex+1),":", aDevice
+                print(index-(videoIndex+1),":", aDevice)
                 videoDevices.append(fixCaracters(aDevice))    
-        print "audio device deduced from devices.txt", audioDevices
-        print "video device deduced from devices.txt", videoDevices     
+        print("=== audio device deduced from devices.txt ===", audioDevices)
+        print("=== video device deduced from devices.txt ===", videoDevices)     
         return [audioDevices,videoDevices]
     
 def engageRecording(pathData,audioinputName):
     """ Engage recording """
     global ffmpegHandle
+    #audioinputName="Microphone (RODE NT-USB)"  #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     time = datetime.datetime.now()
     timeStr=str(time)
-    videoFileOutput = pathData+"/"+timeStr[0:10]+'-'+ timeStr[11:13] +"h-"+timeStr[14:16] +"m-" +timeStr[17:19]+"s.mp4"
+    videoFileOutput = pathData+"/"+timeStr[0:10]+'-'+ timeStr[11:13] +"h-"+timeStr[14:16] +"m-" +timeStr[17:19]+"s.mkv"
     cmd=('ffmpeg -f dshow -i video="UScreenCapture" -f dshow -i audio="%s" -q 5 "%s"')%(audioinputName, videoFileOutput)
     ffmpegHandle=subprocess.Popen(cmd,stdin=subprocess.PIPE,shell=True)
     
@@ -100,16 +99,20 @@ def engageRecording(pathData,audioinputName):
 def stopRecording():
     """ Stop recording"""
     global ffmpegHandle
-    try:
-        ffmpegHandle.stdin.write("q") 
-        ffmpegHandle.kill()
-    except:
-        print "WARNING: Can't stop properly FFMPEG subprocess, attempting forced taskkill, media may not be directly readable..."
-        text=_("WARNING: Can't stop properly FFMPEG subprocess,\n attempting forced stop, media may not be readable.")
-        dialog=wx.MessageDialog(None,message=text,caption="WARNING",style=wx.OK|wx.ICON_INFORMATION)
-        dialog.ShowModal()
-        #writeInLogs("- WARNING: Can't stop properly FFMPEG subprocess, attempting forced taskkill, media may lack header as a result and may not be directly readable... "+ str(datetime.datetime.now())+"\n")
-        os.popen("taskkill /F /IM  ffmpeg.exe") 
+    ffmpegHandle.communicate("q")
+    #ffmpegHandle.terminate()
+    #ffmpegHandle.kill()
+    if 0:
+        try:
+            ffmpegHandle.stdin.write("q") 
+            ffmpegHandle.kill()
+        except:
+            print("WARNING: Can't stop properly FFMPEG subprocess, attempting forced taskkill, media may not be directly readable...")
+            text="WARNING: Can't stop properly FFMPEG subprocess,\n attempting forced stop, media may not be readable."
+            dialog=wx.MessageDialog(None,message=text,caption="WARNING",style=wx.OK|wx.ICON_INFORMATION)
+            dialog.ShowModal()
+            #writeInLogs("- WARNING: Can't stop properly FFMPEG subprocess, attempting forced taskkill, media may lack header as a result and may not be directly readable... "+ str(datetime.datetime.now())+"\n")
+            os.popen("taskkill /F /IM  ffmpeg.exe") 
 
 def openFolder(pathData):
     """ Open Publish recording"""
@@ -124,9 +127,9 @@ def createRecordingsFolder():
     # Create a default folder for the recordings
     pathData=os.environ["USERPROFILE"]+"\\FFscreenrecorder"
     if os.path.isdir(os.environ["USERPROFILE"]+"\\FFscreenrecorder"):
-        print "Default data folder OK"
+        print("Default data folder OK")
     else: 
-        print "Creating default data folder in USERPROFILE\\FFscreenrecorder"
+        print("Creating default data folder in USERPROFILE\\FFscreenrecorder")
         os.mkdir(pathData) 
     return pathData
 
@@ -216,11 +219,11 @@ class MainFrame(wx.Frame):
         
     def configuration(self,evt):
         """ A function to search for a configuration file"""
-        print "Configuration file to come..."
+        print("Configuration file to come...")
         
     def about(self,evt):
         """ A function to show an about popup"""
-        print "In about"
+        print("In about")
 
 if __name__=="__main__":
         
@@ -231,7 +234,7 @@ if __name__=="__main__":
     # Create and set a taskbar icon giving app state
     icon1 = wx.Icon('images/statusIdle.ico', wx.BITMAP_TYPE_ICO)
     icon2 = wx.Icon('images/statusRecording.ico', wx.BITMAP_TYPE_ICO)
-    tbicon = wx.TaskBarIcon()
+    tbicon = wx.adv.TaskBarIcon()
     tbicon.SetIcon(icon1, "FFSR Idle")
     
     # Create a data folder if not present in ALLUSERSDATA
